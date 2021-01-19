@@ -13,7 +13,6 @@ import { Hero } from '../models/hero';
 })
 export class HeroesComponent implements OnInit {
   heroes: Hero[];
-  selectedHero: Hero;
 
   constructor(private heroService: HeroService, private messageService: MessageService) { }
 
@@ -21,12 +20,23 @@ export class HeroesComponent implements OnInit {
     this.getHeroes();
   }
 
-  onSelect(hero: Hero): void{
-    this.selectedHero = hero;
-    this.messageService.add(`HeroesCompoent: Selected hero id=${hero.id}`);
-  }
-
   getHeroes(): void{
     this.heroService.getHeroes().subscribe(x => this.heroes = x);
+  }
+
+  add(name: string): void{
+    name = name.trim();
+    if (!name){return; }
+    this.heroService.addHero({name} as Hero)
+      .subscribe(h => {
+        this.heroes.push(h);
+      });
+  }
+
+  delete(id: number): void{
+    this.heroService.deleteHero(id)
+      .subscribe(() => {
+        this.heroes = this.heroes.filter(x => x.id !== id);
+      });
   }
 }
